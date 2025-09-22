@@ -3,7 +3,7 @@
     public class UserRepository
     {
         private List<User> Users = new List<User>();
-        private int nextId = 1;
+        private static int nextId = 1;
 
         public User CreateUser(string username, string password)
         {
@@ -13,7 +13,15 @@
         }
 
         public User GetUser(int userId) => Users.FirstOrDefault(user => user.UserId == userId);
-        public List<User> GetAllUsers() => Users;
+        public List<User> GetAllUsers()
+        {
+            return Users.Select(u => new User(u.UserId, u.Username, u.Password)
+            {
+                CreatedMedia = new List<Media>(u.CreatedMedia),
+                MyRatings = new List<Rating>(u.MyRatings),
+                Favorites = new List<Media>(u.Favorites)
+            }).ToList();
+        }
 
         public void RemoveUser(int userId, MediaRepository mediaRepo)
         {

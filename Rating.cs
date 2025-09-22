@@ -9,12 +9,8 @@ public class Rating
     public int Stars { get; set; }
 
     private string comment;
-    public string GetComment()
-    {
-        return IsCommentVisible ? comment : "[Comment hidden]";
-    }
-
     private bool IsCommentVisible { get; set; } = false;
+    public string GetComment() => IsCommentVisible ? comment : "[Comment hidden]";
     public DateTime CreatedAt { get; }
 
     private HashSet<User> likedBy = new HashSet<User>();
@@ -30,8 +26,8 @@ public class Rating
         CreatedAt = DateTime.Now;
     }
 
-    public bool AddLike(User user) => likedBy.Add(user);
-    public bool RemoveLike(User user) => likedBy.Remove(user);
+    public bool Like(User user) => likedBy.Add(user);
+    public bool Unlike(User user) => likedBy.Remove(user);
 
     public void ConfirmComment() => IsCommentVisible = true;
     public bool IsVisible() => IsCommentVisible;

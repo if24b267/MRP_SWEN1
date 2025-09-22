@@ -15,7 +15,23 @@
         }
 
         public Media GetMedia(int mediaId) => MediaList.FirstOrDefault(m => m.MediaId == mediaId);
-        public List<Media> GetAllMedia() => MediaList;
+        public List<Media> GetAllMedia()
+        {
+            return MediaList.Select(m => new Media(
+                m.MediaId,
+                m.Title,
+                m.Description,
+                m.Type,
+                m.ReleaseYear,
+                new List<string>(m.Genres),
+                m.AgeRestriction,
+                m.Creator
+            )
+            {
+                Ratings = new List<Rating>(m.Ratings)
+            }).ToList();
+        }
+
         public void UpdateMedia(Media media, string title = null, string description = null)
         {
             if (title != null)
@@ -27,12 +43,26 @@
                 media.Description = description;
             }
         }
+
         public void DeleteMedia(Media media)
         {
+            if (media == null || !MediaList.Contains(media))
+            {
+                return;
+            }
+
+            foreach (Rating rating in media.Ratings)
+            {
+                rating.Author.MyRatings.Remove(rating);
+                media.Ratings.Remove(rating);
+            }
+
+            media.Creator?.CreatedMedia.Remove(media);
+
             MediaList.Remove(media);
-            media.Creator.CreatedMedia.Remove(media);
         }
 
-        public List<Media> SearchByTitle(string query) => MediaList.Where(m => m.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        public List<Media> SearchByTitle(string query) => MediaList.Where(media => media.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

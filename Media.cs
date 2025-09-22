@@ -35,10 +35,11 @@
 
         public double AverageRating() => Ratings.Count == 0 ? 0 : Ratings.Average(r => r.Stars);
 
-        public IEnumerable<Rating> GetVisibleRatings() => Ratings.Where(rating => rating.IsCommentVisible);
+        public List<Rating> GetVisibleRatings() => Ratings.Where(rating => rating.IsVisible()).ToList();
 
         public void PrintInfo()
         {
+            Console.WriteLine($"Id: {MediaId}");
             Console.WriteLine($"{Type} {Title} {ReleaseYear} - Age {AgeRestriction}+");
             Console.WriteLine($"Genres: {string.Join(", ", Genres)}");
             Console.WriteLine($"Average Rating: {AverageRating()}");

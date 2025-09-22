@@ -17,11 +17,18 @@
 
             // neues Rating
             Rating rating = alice.RateMedia(movie, 5, "Toller Film!");
-            Console.WriteLine($"Vor Edit: {rating.Stars} Sterne - {rating.Comment}");
+            Console.WriteLine($"Vor Edit: {rating.Stars} Sterne - {rating.GetComment()}\n");
 
-            // editieren
+            // Bob gibt Rating ab
+            Rating ratingFromBob = bob.RateMedia(series, 4, "Gute Serie!");
+            Console.WriteLine($"{ratingFromBob.Stars} Sterne - {ratingFromBob.GetComment()}\n");
+
+            // Kommentar von Alice bestätigen
+            rating.ConfirmComment();
+            Console.WriteLine($"Nach Bestätigung: {rating.Stars} Sterne - {rating.GetComment()}\n");
+
             alice.EditRating(rating, 4, "Immer noch gut, aber nicht perfekt.");
-            Console.WriteLine($"Nach Edit: {rating.Stars} Sterne - {rating.Comment} (sichtbar? {rating.IsCommentVisible})");
+            Console.WriteLine($"Nach Edit: {rating.Stars} Sterne - {rating.GetComment()}\n");
 
             // löschen
             alice.DeleteRating(rating, movie);

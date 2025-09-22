@@ -14,7 +14,7 @@
             return media;
         }
 
-        public Media GetMedia(int id) => MediaList.FirstOrDefault(m => m.MediaId == id);
+        public Media GetMedia(int mediaId) => MediaList.FirstOrDefault(m => m.MediaId == mediaId);
         public List<Media> GetAllMedia() => MediaList;
         public void UpdateMedia(Media media, string title = null, string description = null)
         {

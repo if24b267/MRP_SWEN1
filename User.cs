@@ -15,6 +15,7 @@
             Username = username;
             Password = password;
         }
+
         public Rating RateMedia(Media mediaEntry, int stars, string comment = "")
         {
             if (stars < 1 || stars > 5)
@@ -42,6 +43,7 @@
             }
 
             rating.Stars = newStars;
+            rating.EditComment(newComment);
         }
 
         public void DeleteRating(Rating rating, Media mediaEntry)
@@ -65,7 +67,7 @@
 
         public void PrintProfile()
         {
-            Console.WriteLine($"User: {Username}");
+            Console.WriteLine($"User: {Username}, Id: {UserId}");
             Console.WriteLine($"Created Media: {CreatedMedia.Count}");
             Console.WriteLine($"Ratings given: {MyRatings.Count}");
             Console.WriteLine($"Favorites: {Favorites.Count}\n");

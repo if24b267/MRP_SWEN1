@@ -1,41 +1,15 @@
-﻿using MRP_SWEN1;
-
-public class Rating
+﻿namespace MRP_SWEN1
 {
-    private static int nextId = 1;
-    public int RatingId { get; }
-    public User Author { get; }
-    public Media MediaEntry { get; }
-    public int Stars { get; set; }
-
-    private string comment;
-    private bool IsCommentVisible { get; set; } = false;
-    public string GetComment() => IsCommentVisible ? comment : "[Comment hidden]";
-    public DateTime CreatedAt { get; }
-
-    private HashSet<User> likedBy = new HashSet<User>();
-    public IReadOnlyCollection<User> LikedBy => likedBy;
-
-    public Rating(User author, Media mediaEntry, int stars, string comment = "")
+    // Rating model stored in the rating repository.
+    // Confirmed is a moderation flag — not used in the intermediate hand-in UI.
+    public class Rating
     {
-        RatingId = nextId++;
-        Author = author;
-        MediaEntry = mediaEntry;
-        Stars = stars;
-        this.comment = comment;
-        CreatedAt = DateTime.Now;
-    }
-
-    public bool Like(User user) => likedBy.Add(user);
-    public bool Unlike(User user) => likedBy.Remove(user);
-
-    public void ConfirmComment() => IsCommentVisible = true;
-    public bool IsVisible() => IsCommentVisible;
-
-    public void EditComment(string newComment)
-    {
-        comment = newComment;
-        IsCommentVisible = false;
+        public int Id { get; set; }
+        public int MediaId { get; set; }
+        public int UserId { get; set; }
+        public int Stars { get; set; } // 1..5
+        public string? Comment { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public bool Confirmed { get; set; } = false; // moderation flag (default false)
     }
 }
-

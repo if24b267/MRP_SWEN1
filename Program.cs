@@ -1,67 +1,48 @@
-﻿namespace MRP_SWEN1
+﻿using MRP_SWEN1.Auth;
+using MRP_SWEN1.Controllers;
+using MRP_SWEN1.Repositories;
+using MRP_SWEN1.Services;
+
+namespace MRP_SWEN1
 {
+    // Program entry point. For the intermediate hand-in we always run the in-memory server.
+    // This keeps the project easy to run (no DB setup).
     public class Program
     {
         static void Main(string[] args)
         {
-            UserRepository userRepo = new UserRepository();
-            MediaRepository mediaRepo = new MediaRepository();
+            int port = Environment.GetEnvironmentVariable("MRP_PORT") is string p && int.TryParse(p, out var pp) ? pp : 8080;
 
-            //User creation
-            User alice = userRepo.CreateUser("alice", "123456");
-            User bob = userRepo.CreateUser("bob", "xoHPV2zYeouVNcMk");
+            Console.WriteLine($"Starting MRP HTTP server on http://localhost:{port}/api/");
+            var server = new HttpServer(prefix: $"http://+:{port}/api/");
 
-            //Media Creation:
-            Media movie = mediaRepo.CreateMedia("Inception", "A mind-bending thriller", MediaType.Movie, 2010, new List<string> { "Sci-Fi", "Action" }, 12, alice);
-            Media series = mediaRepo.CreateMedia("Stranger Things", "Mystery in Hawkins", MediaType.Series, 2016, new List<string> { "Mystery", "Horror" }, 14, bob);
+            Console.WriteLine("Running in IN-MEMORY mode for the Intermediate hand-in.");
+            StartWithInMemory(server);
 
-            // neues Rating
-            Rating rating = alice.RateMedia(movie, 5, "Toller Film!");
-            Console.WriteLine($"Vor Edit: {rating.Stars} Sterne - {rating.GetComment()}\n");
+            Console.WriteLine("Press Ctrl+C to stop.");
 
-            // Bob gibt Rating ab
-            Rating ratingFromBob = bob.RateMedia(series, 4, "Gute Serie!");
-            Console.WriteLine($"{ratingFromBob.Stars} Sterne - {ratingFromBob.GetComment()}\n");
+            var exitEvent = new System.Threading.ManualResetEvent(false);
+            Console.CancelKeyPress += (s, e) => { e.Cancel = true; server.Stop(); exitEvent.Set(); };
+            exitEvent.WaitOne();
+        }
 
-            // Kommentar von Alice bestätigen
-            rating.ConfirmComment();
-            Console.WriteLine($"Nach Bestätigung: {rating.Stars} Sterne - {rating.GetComment()}\n");
+        static void StartWithInMemory(HttpServer server)
+        {
+            // create in-memory repos
+            var userRepo = new InMemoryUserRepository();
+            var mediaRepo = new InMemoryMediaRepository();
+            var ratingRepo = new InMemoryRatingRepository();
 
-            alice.EditRating(rating, 4, "Immer noch gut, aber nicht perfekt.");
-            Console.WriteLine($"Nach Edit: {rating.Stars} Sterne - {rating.GetComment()}\n");
+            // tokenstore + auth service
+            var tokenStore = new TokenStore();
+            var authService = new AuthService(userRepo, tokenStore);
 
-            // löschen
-            alice.DeleteRating(rating, movie);
-            Console.WriteLine($"Ratings von Alice: {alice.MyRatings.Count}, Media-Ratings: {movie.Ratings.Count}\n");
+            // controllers
+            var usersController = new UsersController(userRepo, authService, tokenStore);
+            var mediaController = new MediaController(mediaRepo, ratingRepo, authService, tokenStore);
 
-            //Favorites
-            alice.AddToFavorites(series);
-
-            //Demo outputs
-            Console.WriteLine("Media List:\n");
-            foreach (Media media in mediaRepo.GetAllMedia())
-            {
-                media.PrintInfo();
-            }
-            Console.WriteLine();
-
-            Console.WriteLine("User Profiles:\n");
-            foreach(User user in userRepo.GetAllUsers())
-            {
-                user.PrintProfile();
-            }
-
-            Console.WriteLine();
-
-            //Search example
-            Console.WriteLine("Search Media by 'Stranger': ");
-            List<Media> searchResult = mediaRepo.SearchByTitle("Stranger");
-            foreach(Media media in searchResult)
-            {
-                media.PrintInfo();
-            }
-
-            Console.ReadKey();
+            // register routes and start the server
+            server.StartWithControllers(usersController, mediaController);
         }
     }
 }

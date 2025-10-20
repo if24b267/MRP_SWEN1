@@ -32,9 +32,9 @@ namespace MRP_SWEN1
             // Convert the route pattern into a regular expression
             // Example: "/api/users/{username}" -> "^/api/users/([^/]+)$"
             // Each {param} becomes "([^/]+)" which captures one path segment
-            var pattern = "^" + Regex.Replace(pathPattern, @"\{([^}]+)\}", m => {
+            var pattern = "^" + Regex.Replace(pathPattern, @"\{([^}]+)\}", match => {
                 // Save the name inside { } (for example: "username")
-                paramNames.Add(m.Groups[1].Value);
+                paramNames.Add(match.Groups[1].Value);
 
                 // Replace it with a capture group for that part of the path.
                 // A capture group means a part of the regex that "captures" text to read it later.

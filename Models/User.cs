@@ -1,4 +1,4 @@
-﻿namespace MRP_SWEN1
+﻿namespace MRP_SWEN1.Models
 {
     // User model: store password hash + salt (byte[]). Public profile fields are optional.
     public class User

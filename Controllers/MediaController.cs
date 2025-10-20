@@ -1,4 +1,5 @@
 ﻿using MRP_SWEN1.Auth;
+using MRP_SWEN1.Models;
 using MRP_SWEN1.Repositories;
 using MRP_SWEN1.Services;
 using System.Text.Json;
@@ -14,7 +15,7 @@ namespace MRP_SWEN1.Controllers
         private readonly IRatingRepository _ratingRepo;
         private readonly AuthService _auth;
         private readonly TokenStore _tokenStore;
-
+         
         public MediaController(IMediaRepository mediaRepo, IRatingRepository ratingRepo, AuthService auth, TokenStore tokenStore)
         {
             _mediaRepo = mediaRepo;

@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Net;
 
-namespace MRP_SWEN1
+namespace MRP_SWEN1.Models
 {
     // Represents one HTTP request + response + any extracted route parameters.
     public class RoutingRequest

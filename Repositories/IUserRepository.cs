@@ -1,4 +1,6 @@
-﻿namespace MRP_SWEN1.Repositories
+﻿using MRP_SWEN1.Models;
+
+namespace MRP_SWEN1.Repositories
 {
     public interface IUserRepository
     {

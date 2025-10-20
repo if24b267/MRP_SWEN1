@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using MRP_SWEN1.Models;
+using System.Collections.Concurrent;
 
 namespace MRP_SWEN1.Repositories
 {

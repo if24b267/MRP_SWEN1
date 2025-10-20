@@ -1,4 +1,5 @@
 ﻿using MRP_SWEN1.Auth;
+using MRP_SWEN1.Models;
 using MRP_SWEN1.Repositories;
 using System.Security.Cryptography;
 

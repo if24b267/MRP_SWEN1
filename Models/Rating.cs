@@ -1,4 +1,4 @@
-﻿namespace MRP_SWEN1
+﻿namespace MRP_SWEN1.Models
 {
     // Rating model stored in the rating repository.
     // Confirmed is a moderation flag — not used in the intermediate hand-in UI.

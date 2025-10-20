@@ -1,4 +1,6 @@
-﻿namespace MRP_SWEN1.Repositories
+﻿using MRP_SWEN1.Models;
+
+namespace MRP_SWEN1.Repositories
 {
     // Interface for media persistence (keeps storage implementation swappable).
     public interface IMediaRepository

@@ -1,6 +1,5 @@
 ﻿namespace MRP_SWEN1.Repositories
 {
-    // Interfaces for other repositories - kept small for the hand-in.
     public interface IRatingRepository
     {
         Task<int> Create(Rating rating);

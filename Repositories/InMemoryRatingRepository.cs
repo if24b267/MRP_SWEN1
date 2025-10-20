@@ -31,8 +31,11 @@ namespace MRP_SWEN1.Repositories
         public Task Update(Rating rating)
         {
             if (!_store.ContainsKey(rating.Id))
+            {
                 throw new KeyNotFoundException("rating not found");
+            }
             _store[rating.Id] = rating;
+
             return Task.CompletedTask;
         }
 

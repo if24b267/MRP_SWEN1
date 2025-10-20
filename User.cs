@@ -7,9 +7,6 @@
         public string Username { get; set; } = "";
         public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
         public byte[] Salt { get; set; } = Array.Empty<byte>();
-
-        // public profile fields
-        public string? Email { get; set; }
         public string? FavoriteGenre { get; set; }
     }
 }

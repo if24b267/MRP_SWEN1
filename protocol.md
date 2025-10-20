@@ -8,7 +8,7 @@
 
 ## Kurze Zusammenfassung
 Dieses Projekt implementiert einen kleinen REST-HTTP-Server in **C#** (basierend auf `HttpListener`) für eine **Media Ratings Platform (MRP)**.  
-Für das *Intermediate Hand-In* läuft die Anwendung vollständig **im In-Memory-Modus**, d.h. ohne externe Datenbank.
+Für das *Intermediate Hand-In* läuft die Anwendung vollständig **im In-Memory-Modus**, das heißt ohne externe Datenbank.
 
 Ziel war es, die geforderten **MUST-HAVEs** umzusetzen:
 - funktionierender Server mit Routing,

@@ -39,7 +39,7 @@ namespace MRP_SWEN1.Controllers
             var body = await new StreamReader(rr.Request.InputStream).ReadToEndAsync();
             try
             {
-                // deserialize case-insensitively so clients don't have to match exact casing
+                // deserialize case-insensitively so clients do not have to match exact casing
                 var m = JsonSerializer.Deserialize<MediaEntry>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (m == null)
                 {
@@ -47,6 +47,7 @@ namespace MRP_SWEN1.Controllers
                     await HttpServer.WriteResponse(rr.Response, new { error = "invalid payload" });
                     return;
                 }
+
                 // ensure ownership is recorded
                 m.CreatorUserId = info.UserId;
                 var id = await _mediaRepo.Create(m);
@@ -79,6 +80,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid id" });
                 return;
             }
+
             var m = await _mediaRepo.GetById(id);
             if (m == null)
             {
@@ -87,7 +89,7 @@ namespace MRP_SWEN1.Controllers
                 return;
             }
 
-            // include ratings for this media. Map to a lightweight DTO shape for response.
+            // include ratings for this media. Map to a DTO shape for response.
             var ratings = (await _ratingRepo.GetByMediaId(id)).Select(r => new {
                 id = r.Id,
                 mediaId = r.MediaId,
@@ -112,6 +114,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "Unauthorized" });
                 return;
             }
+
             var idStr = rr.RouteParams.ContainsKey("id") ? rr.RouteParams["id"] : null;
             if (!int.TryParse(idStr, out var id))
             {
@@ -119,6 +122,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid id" });
                 return;
             }
+
             var existing = await _mediaRepo.GetById(id);
             if (existing == null)
             {
@@ -126,12 +130,14 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "not found" });
                 return;
             }
+
             if (existing.CreatorUserId != info.UserId)
             {
                 rr.Response.StatusCode = 403;
                 await HttpServer.WriteResponse(rr.Response, new { error = "forbidden" });
                 return;
             }
+
             var body = await new StreamReader(rr.Request.InputStream).ReadToEndAsync();
             var upd = JsonSerializer.Deserialize<MediaEntry>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (upd == null)
@@ -140,9 +146,11 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid payload" });
                 return;
             }
+
             // preserve id and creator
             upd.Id = id;
             upd.CreatorUserId = existing.CreatorUserId;
+
             await _mediaRepo.Update(upd);
             await HttpServer.WriteResponse(rr.Response, new { message = "updated" });
         }
@@ -157,6 +165,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "Unauthorized" });
                 return;
             }
+
             var idStr = rr.RouteParams.ContainsKey("id") ? rr.RouteParams["id"] : null;
             if (!int.TryParse(idStr, out var id))
             {
@@ -164,6 +173,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid id" });
                 return;
             }
+
             var existing = await _mediaRepo.GetById(id);
             if (existing == null)
             {
@@ -171,12 +181,14 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "not found" });
                 return;
             }
+
             if (existing.CreatorUserId != info.UserId)
             {
                 rr.Response.StatusCode = 403;
                 await HttpServer.WriteResponse(rr.Response, new { error = "forbidden" });
                 return;
             }
+
             await _mediaRepo.Delete(id);
             await HttpServer.WriteResponse(rr.Response, new { message = "deleted" });
         }
@@ -221,6 +233,7 @@ namespace MRP_SWEN1.Controllers
                     await HttpServer.WriteResponse(rr.Response, new { error = "stars (1-5) required" });
                     return;
                 }
+
                 var stars = s.GetInt32();
                 if (stars < 1 || stars > 5)
                 {
@@ -228,6 +241,7 @@ namespace MRP_SWEN1.Controllers
                     await HttpServer.WriteResponse(rr.Response, new { error = "stars must be 1..5" });
                     return;
                 }
+
                 var comment = doc.TryGetProperty("comment", out var c) ? c.GetString() : null;
 
                 var rating = new Rating
@@ -239,7 +253,9 @@ namespace MRP_SWEN1.Controllers
                     Timestamp = DateTime.UtcNow,
                     Confirmed = false
                 };
+
                 var id = await _ratingRepo.Create(rating);
+
                 rr.Response.StatusCode = 201;
                 await HttpServer.WriteResponse(rr.Response, new { id });
             }
@@ -261,6 +277,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid media id" });
                 return;
             }
+
             var media = await _mediaRepo.GetById(mediaId);
             if (media == null)
             {
@@ -283,6 +300,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "Unauthorized" });
                 return;
             }
+
             var idStr = rr.RouteParams.ContainsKey("id") ? rr.RouteParams["id"] : null;
             if (!int.TryParse(idStr, out var ratingId))
             {
@@ -290,6 +308,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid rating id" });
                 return;
             }
+
             var existing = await _ratingRepo.GetById(ratingId);
             if (existing == null)
             {
@@ -297,6 +316,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "rating not found" });
                 return;
             }
+
             if (existing.UserId != info.UserId)
             {
                 rr.Response.StatusCode = 403;
@@ -319,13 +339,16 @@ namespace MRP_SWEN1.Controllers
                     }
                     existing.Stars = stars;
                 }
+
                 if (doc.TryGetProperty("comment", out var c))
                 {
                     existing.Comment = c.GetString();
                 }
+
                 // editing resets moderation flag and updates timestamp
                 existing.Confirmed = false;
                 existing.Timestamp = DateTime.UtcNow;
+
                 await _ratingRepo.Update(existing);
                 await HttpServer.WriteResponse(rr.Response, new { message = "rating updated" });
             }
@@ -347,6 +370,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "Unauthorized" });
                 return;
             }
+
             var idStr = rr.RouteParams.ContainsKey("id") ? rr.RouteParams["id"] : null;
             if (!int.TryParse(idStr, out var ratingId))
             {
@@ -354,6 +378,7 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "invalid rating id" });
                 return;
             }
+
             var existing = await _ratingRepo.GetById(ratingId);
             if (existing == null)
             {
@@ -361,12 +386,14 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "rating not found" });
                 return;
             }
+
             if (existing.UserId != info.UserId)
             {
                 rr.Response.StatusCode = 403;
                 await HttpServer.WriteResponse(rr.Response, new { error = "forbidden" });
                 return;
             }
+
             await _ratingRepo.Delete(ratingId);
             await HttpServer.WriteResponse(rr.Response, new { message = "rating deleted" });
         }

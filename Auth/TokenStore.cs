@@ -17,6 +17,7 @@ namespace MRP_SWEN1.Auth
     // tokens are kept in memory instead of a DB.
     public class TokenStore
     {
+        // Thread-safe dictionary, so multiple requests can read/write safely.
         private readonly ConcurrentDictionary<string, TokenInfo> _store = new();
 
         // Add or replace token

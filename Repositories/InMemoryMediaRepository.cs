@@ -2,8 +2,8 @@
 
 namespace MRP_SWEN1.Repositories
 {
-    // Simple thread-safe in-memory repository used for the intermediate hand-in.
-    // I used ConcurrentDictionary so multiple requests can be handled concurrently in the demo.
+    // Simple thread-safe in-memory repository.
+    // I used ConcurrentDictionary so multiple requests can be handled concurrently.
     public class InMemoryMediaRepository : IMediaRepository
     {
         private readonly ConcurrentDictionary<int, MediaEntry> _store = new();
@@ -27,10 +27,11 @@ namespace MRP_SWEN1.Repositories
 
         public Task<IEnumerable<MediaEntry>> Search(string titleFilter)
         {
-            var q = titleFilter?.Trim().ToLowerInvariant() ?? "";
+            var query = titleFilter?.Trim().ToLowerInvariant() ?? "";
+
             var res = _store.Values
-                .Where(m => string.IsNullOrEmpty(q) || m.Title.ToLowerInvariant().Contains(q))
-                .OrderBy(m => m.Title)
+                .Where(media => string.IsNullOrEmpty(query) || media.Title.ToLowerInvariant().Contains(query))
+                .OrderBy(media => media.Title)
                 .ToList()
                 .AsEnumerable();
 

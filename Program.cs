@@ -11,11 +11,16 @@ namespace MRP_SWEN1
     {
         static void Main(string[] args)
         {
+            // IMPORTANT: On Windows, HttpListener may require admin rights if "http://+:{port}/" is used.
+            // Recommendation: run in an administrator terminal or change the URL to "http://localhost:{port}/"
+            // to start without admin rights.
+
+
             // Check if an environment variable "MRP_PORT" exists --> use it as the port number
             // If not (or if it is invalid), just use 8080 as the default port. Basically: lets us change the port without editing the code.
             int port = Environment.GetEnvironmentVariable("MRP_PORT") is string p && int.TryParse(p, out var pp) ? pp : 8080;
 
-            Console.WriteLine($"Starting MRP HTTP server on http://localhost:{port}/api/");
+            Console.WriteLine($"Starting MRP HTTP server on http://+:{port}/api/");
             var server = new HttpServer(prefix: $"http://+:{port}/api/");
 
             Console.WriteLine("Running in IN-MEMORY mode for the Intermediate hand-in.");

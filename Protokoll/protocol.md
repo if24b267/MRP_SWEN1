@@ -72,6 +72,19 @@ Ziel war es, die geforderten **MUST-HAVEs** umzusetzen:
 
 ---
 
+
+## Hinweise zum Starten
+
+Unter Windows benötigt HttpListener bei http://+:8080/ Adminrechte.
+
+Empfehlung für den Intermediate Hand-In: Server mit folgendem Befehl im Administrator-Terminal starten:
+
+- dotnet run
+
+Alternativ kann die URL auf http://localhost:8080/ geändert werden, um ohne Adminrechte zu starten.
+
+---
+
 ## Geschätzter Zeitaufwand
 - Grundimplementierung Router / Server / Controller: ~25h  
 - Repositories & Authentifizierung: ~6h  

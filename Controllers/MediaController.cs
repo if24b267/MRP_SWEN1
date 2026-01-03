@@ -29,7 +29,7 @@ namespace MRP_SWEN1.Controllers
         // Body: MediaEntry JSON. We set CreatorUserId from the authenticated user.
         public async Task HandleCreate(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;
@@ -108,7 +108,7 @@ namespace MRP_SWEN1.Controllers
         // Body: MediaEntry JSON (we ignore CreatorUserId from client and keep original)
         public async Task HandleUpdate(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;
@@ -159,7 +159,7 @@ namespace MRP_SWEN1.Controllers
         // Delete media — only the creator may delete
         public async Task HandleDelete(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;
@@ -200,7 +200,7 @@ namespace MRP_SWEN1.Controllers
         // Creates a rating for the media by the current user.
         public async Task HandleRate(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;
@@ -256,6 +256,7 @@ namespace MRP_SWEN1.Controllers
                 };
 
                 var id = await _ratingRepo.Create(rating);
+                rating.Id = id;
 
                 rr.Response.StatusCode = 201;
                 await HttpServer.WriteResponse(rr.Response, new { id });
@@ -294,7 +295,7 @@ namespace MRP_SWEN1.Controllers
         // PUT /api/ratings/{id}  — edit rating by owner
         public async Task HandleUpdateRating(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;
@@ -364,7 +365,7 @@ namespace MRP_SWEN1.Controllers
         // Only the rating owner may delete their rating.
         public async Task HandleDeleteRating(RoutingRequest rr)
         {
-            var authHeader = rr.Request.Headers["Authorization"];
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
             if (!_auth.TryAuthenticate(authHeader, out var info))
             {
                 rr.Response.StatusCode = 401;

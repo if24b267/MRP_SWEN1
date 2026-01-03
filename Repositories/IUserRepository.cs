@@ -1,11 +1,11 @@
-﻿using MRP_SWEN1.Models;
+﻿    using MRP_SWEN1.Models;
 
-namespace MRP_SWEN1.Repositories
-{
-    public interface IUserRepository
+    namespace MRP_SWEN1.Repositories
     {
-        Task<User?> GetByUsername(string username);
-        Task<User?> GetById(int id);
-        Task<int> Create(User user);
+        public interface IUserRepository
+        {
+            Task<User?> GetByUsername(string username);
+            Task<User?> GetById(int id);
+            Task<int> Create(User user);
+        }
     }
-}

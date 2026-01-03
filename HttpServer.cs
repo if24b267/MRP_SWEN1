@@ -22,29 +22,48 @@ namespace MRP_SWEN1
         }
 
         // Start only with already-created controllers (In-Memory mode)
-        public void StartWithControllers(UsersController usersController, MediaController mediaController)
+        public void StartWithControllers(
+            UsersController uc,
+            MediaController mc,
+            FavoritesController fc,
+            StatisticsController sc,
+            RecommendationsController rc,
+            RatingLikesController lc)
         {
-            // Register routes
+            // User
+            _router.Register("POST", "/api/users/register", uc.HandleRegister);
+            _router.Register("POST", "/api/users/login", uc.HandleLogin);
+            _router.Register("GET", "/api/users/{username}/profile", uc.HandleGetProfile);
 
-            // User routes
-            _router.Register("POST", "/api/users/register", usersController.HandleRegister);
-            _router.Register("POST", "/api/users/login", usersController.HandleLogin);
-            _router.Register("GET", "/api/users/{username}/profile", usersController.HandleGetProfile);
+            // Media
+            _router.Register("POST", "/api/media", mc.HandleCreate);
+            _router.Register("GET", "/api/media", mc.HandleSearch);
+            _router.Register("GET", "/api/media/{id}", mc.HandleGetById);
+            _router.Register("PUT", "/api/media/{id}", mc.HandleUpdate);
+            _router.Register("DELETE", "/api/media/{id}", mc.HandleDelete);
 
-            // Media routes
-            _router.Register("POST", "/api/media", mediaController.HandleCreate);
-            _router.Register("GET", "/api/media", mediaController.HandleSearch);
-            _router.Register("GET", "/api/media/{id}", mediaController.HandleGetById);
-            _router.Register("PUT", "/api/media/{id}", mediaController.HandleUpdate);
-            _router.Register("DELETE", "/api/media/{id}", mediaController.HandleDelete);
+            // Ratings
+            _router.Register("POST", "/api/media/{id}/rate", mc.HandleRate);
+            _router.Register("GET", "/api/media/{id}/ratings", mc.HandleGetRatingsForMedia);
+            _router.Register("PUT", "/api/ratings/{id}", mc.HandleUpdateRating);
+            _router.Register("DELETE", "/api/ratings/{id}", mc.HandleDeleteRating);
 
-            // Ratings routes
-            _router.Register("POST", "/api/media/{id}/rate", mediaController.HandleRate);
-            _router.Register("GET", "/api/media/{id}/ratings", mediaController.HandleGetRatingsForMedia);
-            _router.Register("PUT", "/api/ratings/{id}", mediaController.HandleUpdateRating);
-            _router.Register("DELETE", "/api/ratings/{id}", mediaController.HandleDeleteRating);
+            // Favorites
+            _router.Register("POST", "/api/media/{id}/favorite", fc.HandleToggle);
+            _router.Register("DELETE", "/api/media/{id}/favorite", fc.HandleToggle);
+            _router.Register("GET", "/api/favorites", fc.HandleList);
 
-            // Start listener
+            // Statistics
+            _router.Register("GET", "/api/users/{username}/stats", sc.HandleProfileStats);
+            _router.Register("GET", "/api/leaderboard", sc.HandleLeaderboard);
+
+            // Recommendations
+            _router.Register("GET", "/api/recommendations", rc.HandleRecommendations);
+
+            // Rating Likes
+            _router.Register("POST", "/api/ratings/{id}/like", lc.HandleLike);
+            _router.Register("DELETE", "/api/ratings/{id}/like", lc.HandleUnlike);
+
             _listener.Start();
             _running = true;
             Task.Run(() => ListenLoop());
@@ -111,6 +130,7 @@ namespace MRP_SWEN1
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[ERROR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
                 // catch any unexpected errors in the request handling
                 Console.WriteLine("Unhandled exception: " + ex);
                 try

@@ -1,103 +1,155 @@
-﻿# MRP_SWEN1 — Protokoll (Intermediate Hand-In)
+﻿# MRP_SWEN1 — Protokoll (Final Hand-In)
 
 **Course:** SWEN1 — Media Rating Platform  
 **Author:** Stefan Vukmirovic  
-**Status:** Intermediate hand-in  
+**Status:** Final hand-in  
 
 ---
 
 ## Kurze Zusammenfassung
-Dieses Projekt implementiert einen kleinen REST-HTTP-Server in **C#** (basierend auf `HttpListener`) für eine **Media Ratings Platform (MRP)**.  
-Für das *Intermediate Hand-In* läuft die Anwendung vollständig **im In-Memory-Modus**, das heißt ohne externe Datenbank.
+Dieses Projekt erweitert den bestehenden REST-HTTP-Server aus dem *Intermediate Hand-In* zu einer vollständigen **Media Rating Platform (MRP)**.  
+Die Anwendung basiert weiterhin auf **C# und HttpListener** (ohne ASP.NET), verwendet im Final jedoch **PostgreSQL** zur persistenten Datenspeicherung.
 
-Ziel war es, die geforderten **MUST-HAVEs** umzusetzen:
-- funktionierender Server mit Routing,
-- REST-Endpunkte (Register/Login/Media CRUD/Rating),
-- Token-basierte Authentifikation,
-- Modellklassen (`User`, `MediaEntry`, `Rating`),
-- Integrationstest (automatisiert über Bash-Skript).
+Für das *Final Hand-In* wurden die In-Memory-Repositories durch PostgreSQL-Implementierungen ersetzt, zusätzliche Business-Features umgesetzt sowie automatisierte Tests ergänzt.
+
+---
+
+## Ziel des Final Hand-Ins
+Umsetzung aller geforderten **Final MUST-HAVEs**, insbesondere:
+- funktionierender HTTP-Server mit Routing
+- REST-Endpunkte (Auth, Media CRUD, Ratings, Favorites, Likes, Stats, Recommendations)
+- Token-basierte Authentifizierung
+- PostgreSQL-Anbindung (ohne ORM)
+- Schutz vor SQL-Injection durch parametrisierte Queries
+- Docker-Setup für die Datenbank
+- mindestens **20 Unit-Tests**
+- automatisierter Integrationstest (curl)
 
 ---
 
 ## Technische Entscheidungen
-- **HttpListener:** Reines HTTP ohne Frameworks (z. B. kein ASP.NET).
-- **In-Memory-Repositories:**  
-  - `InMemoryUserRepository`  
-  - `InMemoryMediaRepository`  
-  - `InMemoryRatingRepository`  
-  → Vorteil: kein Setup externer Datenbank notwendig.
+- **HttpListener:**  
+  Reines HTTP ohne Frameworks (z. B. kein ASP.NET), um Routing- und Protokoll-Logik selbst umzusetzen.
+
+- **PostgreSQL + Docker:**  
+  Austausch der In-Memory-Repositories durch:
+  - `PostgreSqlUserRepository`  
+  - `PostgreSqlMediaRepository`  
+  - `PostgreSqlRatingRepository`  
+  → Vorteil: persistente Speicherung und realistische Backend-Architektur.
+
+- **Kein OR-Mapper:**  
+  SQL-Zugriffe erfolgen ausschließlich über **manuell geschriebene, parametrisierte Queries** (`Npgsql`).
+
 - **Architektur / Schichten:**
-  - **Controller:** HTTP-bezogene Logik, Request/Response.
-  - **Services:** Logik für Authentifizierung und Token-Verwaltung (`AuthService`, `TokenStore`).
-  - **Repositories:** Datenzugriff über Interfaces.
-- **Designprinzipien:** Umsetzung von SOLID, v. a. *Single Responsibility* und *Dependency Injection via Constructor*.
-- **Routing:** `Router` wandelt Pfad-Patterns wie `/api/media/{id}` in Regex um und extrahiert Parameter für Controller.
+  - **Controller:** HTTP-bezogene Logik, Request/Response, Statuscodes
+  - **Services:** Authentifizierung und Token-Verwaltung (`AuthService`, `TokenStore`)
+  - **Repositories:** Datenzugriff über Interfaces (Dependency Injection)
+
+- **Designprinzipien:**  
+  Umsetzung von SOLID, insbesondere *Single Responsibility* und *Dependency Injection via Constructor*.
+
+- **Routing:**  
+  Eigene Router-Implementierung, die Pfad-Patterns wie `/api/media/{id}` in Regex umwandelt und Parameter extrahiert.
+
+---
+
+## Erweiterungen im Final
+Zusätzlich zu den Basisfunktionen aus dem Intermediate wurden folgende Features umgesetzt:
+- Favoritenverwaltung
+- Rating-Likes
+- einfache Statistiken (z. B. Leaderboard)
+- Empfehlungen (Recommendations)
 
 ---
 
 ## Klassen / Komponenten (Kurzüberblick)
-- `Program` — Einstiegspunkt; startet den Server im In-Memory-Modus.  
-- `HttpServer` — Verwaltet `HttpListener`, Route-Registrierung, Request-Verarbeitung.  
-- `Router` — Pfad-Matching und Parameter-Parsing.  
-- `UsersController`, `MediaController` — Implementieren die REST-Endpunkte.  
-- `AuthService`, `TokenStore` — Authentifizierung und Token-Verwaltung.  
-- Repositories: `IUserRepository`, `IMediaRepository`, `IRatingRepository` (+ In-Memory-Versionen).  
-- Modelle: `User`, `MediaEntry`, `Rating`.  
+- `Program` — Einstiegspunkt; startet den Server im PostgreSQL-Modus  
+- `HttpServer` — Verwaltung von `HttpListener`, Routen und Request-Verarbeitung  
+- `Router` — Pfad-Matching und Parameter-Parsing  
+- **Controller:**  
+  - `UsersController`  
+  - `MediaController`  
+  - `FavoritesController`  
+  - `StatisticsController`  
+  - `RecommendationsController`  
+  - `RatingLikesController`  
+- **Services:** `AuthService`, `TokenStore`  
+- **Repositories:** `IUserRepository`, `IMediaRepository`, `IRatingRepository` (+ PostgreSQL-Versionen)  
+- **Modelle:** `User`, `MediaEntry`, `Rating`, `Favorite`, `RatingLike`
 
 ---
 
 ## Tests / Integration
-- **Integrationstest-Skript:** `mrp_curl_tests.sh`  
-  Führt automatisiert die gesamte Prozesskette aus:  
-  → Register → Login → Create Media → Rate → Update/Delete Rating → Profile → Cleanup.  
+- **Unit-Tests:**  
+  Insgesamt mindestens **20 Unit-Tests** zur Überprüfung zentraler Geschäftslogik.
 
-- **Abhängigkeit:** Das Skript nutzt `curl` und `jq` (für JSON-Parsing).  
-  - `jq` ist optional, aber empfehlenswert, da es die Ausgabe lesbarer macht.  
-  - Installation unter Windows (Git Bash):  
-    ```bash
-    winget install jqlang.jq
-    ```
-  - Danach kann das Skript mit  
-    ```bash
-    chmod +x mrp_curl_tests.sh
-    ./mrp_curl_tests.sh
-    ```  
-    ausgeführt werden.  
+- **Integrationstest-Skript:** `mrp_curl_tests.sh` (bzw. `.ps1`)  
+  Automatisierter Ablauf:
+  - Register  
+  - Login  
+  - Create Media  
+  - Rate  
+  - Like  
+  - Favorite  
+  - Stats / Leaderboard  
+  - Recommendations  
+  - Cleanup  
 
----
+- **Abhängigkeit:**  
+  Das Skript nutzt `curl` und optional `jq` für JSON-Ausgabe.  
+  Installation unter Windows (Git Bash):
+  winget install jqlang.jq
+
+  Danach kann das Skript mit
+  chmod +x mrp_curl_tests.sh
+  ./mrp_curl_tests.sh 
+  ausgeführt werden.
+
+- ---
 
 ## Probleme & Lösungen (Kurz)
-- **Problem:** `HttpListener` mit `http://+:` benötigt unter Windows teils Adminrechte.  
-  **Lösung:** Verwendung von `http://localhost:8080/` als Fallback oder Start im Admin-Terminal.  
+
+- **Problem:**  
+  `HttpListener` mit `http://+:8080/` benötigt unter Windows teilweise Administratorrechte.
+
+- **Lösung:**  
+  Verwendung von `http://localhost:8080/` als Fallback  
+  **oder** Start des Servers im Administrator-Terminal.
 
 ---
-
 
 ## Hinweise zum Starten
 
-Unter Windows benötigt HttpListener bei http://+:8080/ Adminrechte.
+Unter Windows benötigt `HttpListener` bei `http://+:8080/` Administratorrechte.
 
-Empfehlung für den Intermediate Hand-In: Server mit folgendem Befehl im Administrator-Terminal starten:
-
-- dotnet run
-
-Alternativ kann die URL auf http://localhost:8080/ geändert werden, um ohne Adminrechte zu starten.
+**Empfehlung für das Final Hand-In:**  
+Server im Administrator-Terminal mit folgendem Befehl starten (Git Bash):
+dotnet run
 
 ---
 
 ## Geschätzter Zeitaufwand
-- Grundimplementierung Router / Server / Controller: ~25h  
-- Repositories & Authentifizierung: ~6h  
-- Tests & Debugging / Demo-Skript: ~2h  
-- Dokumentation & Protokoll: ~1h  
 
----
+Der folgende Zeitaufwand bezieht sich auf die **Final-Erweiterung** des Projekts und ist **kumulativ** zum *Intermediate Hand-In* zu verstehen.
 
-## Weiteres / Nächste Schritte (für Final)
-- Austausch der In-Memory-Repositories durch PostgreSQL-Implementierungen (via Npgsql).  
-- Erweiterungen: Favoriten, Leaderboard, Recommendations, Moderation UI.  
+### Final-Erweiterung (kumulativ)
 
----
+- PostgreSQL-Schema & Docker-Setup: **2 h**
+- PostgreSQL-Repositories (3 Klassen): **4 h**
+- Neue Controller (Favorites, Likes, Statistics, Recommendations): **3 h**
+- Unit-Tests (mindestens 20 sinnvolle Tests): **2 h**
+- Integrationstest (curl-Skript erweitern): **1 h**
+- Protokoll aktualisieren: **1 h**
+
+**Gesamt Final:** **13 h**
+
+### Gesamtprojekt
+
+- Intermediate Hand-In: **25 h**
+- Final-Erweiterung: **13 h**
+
+**Gesamtaufwand Projekt:** **38 h**
 
 ## Link to Git
 [https://github.com/if24b267/MRP_SWEN1.git](https://github.com/if24b267/MRP_SWEN1.git)

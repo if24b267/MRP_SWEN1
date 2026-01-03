@@ -6,8 +6,8 @@ namespace MRP_SWEN1
     // Represents one HTTP request + response + any extracted route parameters.
     public class RoutingRequest
     {
-        public HttpListenerRequest Request { get; set; }           // The incoming HTTP request
-        public HttpListenerResponse Response { get; set; }         // The outgoing HTTP response
+        public HttpListenerRequest Request { get; set; } = null!;           // The incoming HTTP request
+        public HttpListenerResponse Response { get; set; } = null!;         // The outgoing HTTP response
         public Dictionary<string, string> RouteParams { get; set; } = new();  // Holds {parameterName -> value}
     }
 
@@ -51,7 +51,7 @@ namespace MRP_SWEN1
 
         // Try to find a matching route for an incoming request (method + path)
         // and extract any parameters like {username}.
-        public RouteHandler Match(string method, string path, out Dictionary<string, string> routeParams)
+        public RouteHandler? Match(string method, string path, out Dictionary<string, string> routeParams)
         {
             routeParams = new();
 

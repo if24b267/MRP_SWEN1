@@ -48,7 +48,8 @@ namespace MRP_SWEN1.Services
         // Token format is simple and not meant for production — it's just demo-friendly.
         public async Task<(bool ok, string? token, string? error, User? user)> Login(string username, string password)
         {
-            var user = await _userRepo.GetByUsername(username);
+            var user = await _userRepo.GetByUsername(username.ToLower());
+
             if (user == null)
             {
                 return (false, null, "Invalid username or password", null);
@@ -57,7 +58,6 @@ namespace MRP_SWEN1.Services
             // recompute hash with the saved salt
             var hash = PBKDF2Hash(password, user.Salt);
 
-            // constant-time comparison (prevents a simple timing leak)
             if (!CryptographicOperations.FixedTimeEquals(hash, user.PasswordHash))
             {
                 return (false, null, "Invalid username or password", null);
@@ -65,7 +65,6 @@ namespace MRP_SWEN1.Services
 
             var token = $"{username}-mrpToken-{Guid.NewGuid()}";
 
-            // store token info in memory so we can validate it later
             _tokenStore.Add(token, new TokenInfo { Token = token, UserId = user.Id, Username = username });
 
             return (true, token, null, user);

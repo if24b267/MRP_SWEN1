@@ -70,7 +70,7 @@ namespace MRP_SWEN1.Controllers
         }
 
         // Get a user's public profile. Requires auth to view profile.
-        // Returns id, username, email (nullable), favoriteGenre (nullable).
+        // Returns id, username, favoriteGenre (nullable).
         public async Task HandleGetProfile(RoutingRequest rr)
         {
             // auth

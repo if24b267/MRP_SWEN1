@@ -1,67 +1,60 @@
-﻿using MRP_SWEN1.Auth;
+﻿using System;
+using System.Threading;
+using MRP_SWEN1.Auth;
 using MRP_SWEN1.Controllers;
 using MRP_SWEN1.Repositories;
 using MRP_SWEN1.Services;
 
 namespace MRP_SWEN1
 {
-    // Program entry point. For the intermediate hand-in we run the in-memory server.
-    // This keeps the project easy to run (no DB setup).
     public class Program
     {
         static void Main(string[] args)
         {
-            // IMPORTANT: On Windows, HttpListener may require admin rights if "http://+:{port}/" is used.
-            // Recommendation: run in an administrator terminal or change the URL to "http://localhost:{port}/"
-            // to start without admin rights.
-
-
-            // Check if an environment variable "MRP_PORT" exists --> use it as the port number
-            // If not (or if it is invalid), just use 8080 as the default port. Basically: lets us change the port without editing the code.
             int port = Environment.GetEnvironmentVariable("MRP_PORT") is string p && int.TryParse(p, out var pp) ? pp : 8080;
 
             Console.WriteLine($"Starting MRP HTTP server on http://+:{port}/api/");
             var server = new HttpServer(prefix: $"http://+:{port}/api/");
 
-            Console.WriteLine("Running in IN-MEMORY mode for the Intermediate hand-in.");
-            StartWithInMemory(server);
+            // PostgreSQL connection string
+            const string connStr = "Host=localhost;Database=mrp_db;Username=mrp_user;Password=mrp_pass";
 
-            Console.WriteLine("Press Ctrl+C to stop.\n");
+            // Repositories
+            var userRepo = new PostgreSqlUserRepository(connStr);
+            var mediaRepo = new PostgreSqlMediaRepository(connStr);
+            var ratingRepo = new PostgreSqlRatingRepository(connStr);
 
-            // Create a "manual reset event" that acts like a signal or gate.
-            // false = "the gate" is closed at first (the program will wait until we open it)
-            var exitEvent = new System.Threading.ManualResetEvent(false);
-
-            // When the user presses CTRL + C in the console:
-            Console.CancelKeyPress += (s, e) =>
-            {
-                e.Cancel = true;          // Stop the program from instantly closing
-                server.Stop();            // Stop the running server "gracefully"
-                exitEvent.Set();          // Open the gate --> allow the program to continue and exit
-            };
-
-            // Wait here until the signal (exitEvent.Set()) is triggered.
-            // This basically keeps the program running until we press CTRL + C.
-            exitEvent.WaitOne();
-        }
-
-        static void StartWithInMemory(HttpServer server)
-        {
-            // create in-memory repos
-            var userRepo = new InMemoryUserRepository();
-            var mediaRepo = new InMemoryMediaRepository();
-            var ratingRepo = new InMemoryRatingRepository();
-
-            // tokenstore + auth service
+            // Auth
             var tokenStore = new TokenStore();
             var authService = new AuthService(userRepo, tokenStore);
 
-            // controllers
+            // Controllers
             var usersController = new UsersController(userRepo, authService, tokenStore);
             var mediaController = new MediaController(mediaRepo, ratingRepo, authService, tokenStore);
+            var favController = new FavoritesController(authService, connStr);
+            var statsController = new StatisticsController(authService, connStr);
+            var recController = new RecommendationsController(authService, connStr);
+            var likeController = new RatingLikesController(authService, connStr);
 
-            // register routes and start the server
-            server.StartWithControllers(usersController, mediaController);
+            // Register routes
+            server.StartWithControllers(
+                usersController,
+                mediaController,
+                favController,
+                statsController,
+                recController,
+                likeController
+            );
+
+            Console.WriteLine("Press Ctrl+C to stop.\n");
+            var exitEvent = new ManualResetEvent(false);
+            Console.CancelKeyPress += (s, e) =>
+            {
+                e.Cancel = true;
+                server.Stop();
+                exitEvent.Set();
+            };
+            exitEvent.WaitOne();
         }
     }
 }

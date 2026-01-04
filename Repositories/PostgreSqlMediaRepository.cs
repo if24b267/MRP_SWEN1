@@ -77,16 +77,9 @@ namespace MRP_SWEN1.Repositories
                          SET title=@Title, description=@Description, media_type=@MediaType,
                              release_year=@ReleaseYear, genres=@Genres, age_restriction=@AgeRestriction
                          WHERE id = @Id;";
-            await db.ExecuteAsync(sql, new
-            {
-                media.Title,
-                media.Description,
-                media.MediaType,
-                media.ReleaseYear,
-                Genres = media.Genres?.ToArray() ?? Array.Empty<string>(),
-                media.AgeRestriction,
-                media.Id
-            });
+            var rows = await db.ExecuteAsync(sql, media);
+            if (rows == 0)
+                throw new KeyNotFoundException("media not found");
         }
 
         public async Task Delete(int id)

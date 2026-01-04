@@ -47,6 +47,7 @@ namespace MRP_SWEN1
             _router.Register("GET", "/api/media/{id}/ratings", mc.HandleGetRatingsForMedia);
             _router.Register("PUT", "/api/ratings/{id}", mc.HandleUpdateRating);
             _router.Register("DELETE", "/api/ratings/{id}", mc.HandleDeleteRating);
+            _router.Register("GET", "/api/ratings/mine", mc.HandleGetMyRatings);
 
             // Favorites
             _router.Register("POST", "/api/media/{id}/favorite", fc.HandleToggle);

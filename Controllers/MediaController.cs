@@ -2,6 +2,8 @@
 using MRP_SWEN1.Models;
 using MRP_SWEN1.Repositories;
 using MRP_SWEN1.Services;
+using Npgsql;
+using Dapper;
 using System.Text.Json;
 
 namespace MRP_SWEN1.Controllers
@@ -15,13 +17,16 @@ namespace MRP_SWEN1.Controllers
         private readonly IRatingRepository _ratingRepo;
         private readonly AuthService _auth;
         private readonly TokenStore _tokenStore;
-         
-        public MediaController(IMediaRepository mediaRepo, IRatingRepository ratingRepo, AuthService auth, TokenStore tokenStore)
+        private readonly string _connStr;
+
+        public MediaController(IMediaRepository mediaRepo, IRatingRepository ratingRepo,
+                       AuthService auth, TokenStore tokenStore, string connStr)
         {
             _mediaRepo = mediaRepo;
             _ratingRepo = ratingRepo;
             _auth = auth;
             _tokenStore = tokenStore;
+            _connStr = connStr;
         }
 
         // Create media
@@ -189,6 +194,11 @@ namespace MRP_SWEN1.Controllers
                 await HttpServer.WriteResponse(rr.Response, new { error = "forbidden" });
                 return;
             }
+
+            // abhängige Ratings löschen (FK-Cascade)
+            using var db = new NpgsqlConnection(_connStr);
+            await db.ExecuteAsync("DELETE FROM rating_likes WHERE rating_id IN (SELECT id FROM ratings WHERE media_id = @id);", new { id });
+            await db.ExecuteAsync("DELETE FROM ratings WHERE media_id = @id;", new { id });
 
             await _mediaRepo.Delete(id);
             await HttpServer.WriteResponse(rr.Response, new { message = "deleted" });
@@ -398,6 +408,20 @@ namespace MRP_SWEN1.Controllers
 
             await _ratingRepo.Delete(ratingId);
             await HttpServer.WriteResponse(rr.Response, new { message = "rating deleted" });
+        }
+
+        // GET /api/ratings/mine
+        public async Task HandleGetMyRatings(RoutingRequest rr)
+        {
+            var authHeader = rr.Request.Headers["Authorization"] ?? "";
+            if (!_auth.TryAuthenticate(authHeader, out var info))
+            {
+                rr.Response.StatusCode = 401;
+                return;
+            }
+
+            var ratings = await _ratingRepo.GetByUserId(info.UserId);
+            await HttpServer.WriteResponse(rr.Response, ratings);
         }
     }
 }

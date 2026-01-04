@@ -33,8 +33,29 @@ namespace MRP_SWEN1.Repositories
         public async Task<IEnumerable<Rating>> GetByMediaId(int mediaId)
         {
             using var db = new NpgsqlConnection(_connStr);
-            const string sql = "SELECT * FROM ratings WHERE media_id = @mediaId ORDER BY timestamp DESC;";
+            const string sql = @"SELECT r.id, r.media_id AS MediaId, r.user_id AS UserId, r.stars, r.comment, 
+                                        r.confirmed, r.timestamp AS CreatedAt,
+                                        u.username
+                                 FROM   ratings r
+                                 JOIN   users   u ON u.id = r.user_id
+                                 WHERE  r.media_id = @mediaId
+                                 AND    r.confirmed = true
+                                 ORDER  BY r.timestamp DESC;";
             return await db.QueryAsync<Rating>(sql, new { mediaId });
+        }
+
+        // Intern z. B. für „meine Ratings“ – liefert auch confirmed = false
+        public async Task<IEnumerable<Rating>> GetByUserId(int userId)
+        {
+            using var db = new NpgsqlConnection(_connStr);
+            const string sql = @"SELECT r.id, r.media_id AS MediaId, r.user_id AS UserId, r.stars, r.comment,
+                                 r.confirmed, r.timestamp AS CreatedAt,
+                                 m.title AS MediaTitle
+                                 FROM   ratings r
+                                 JOIN   media   m ON m.id = r.media_id
+                                 WHERE  r.user_id = @userId
+                                 ORDER  BY r.timestamp DESC;";
+            return await db.QueryAsync<Rating>(sql, new { userId });
         }
 
         public async Task Update(Rating rating)

@@ -19,12 +19,11 @@ namespace MRP_SWEN1.Controllers
 
             using var db = new NpgsqlConnection(_connStr);
             const string sql = @"SELECT COUNT(*) AS total_ratings,
-                                        AVG(stars) AS average_stars,
-                                        favorite_genre
-                                 FROM ratings
-                                 JOIN users ON users.id = ratings.user_id
-                                 WHERE user_id = @uid
-                                 GROUP BY favorite_genre;";
+                                 AVG(stars) AS average_stars,
+                                 MAX(u.favorite_genre) AS favorite_genre
+                                 FROM ratings r
+                                 JOIN users   u ON u.id = r.user_id
+                                 WHERE r.user_id = @uid;";
             var stats = await db.QuerySingleOrDefaultAsync(sql, new { uid = info.UserId });
             await HttpServer.WriteResponse(rr.Response, stats ?? new { total_ratings = 0, average_stars = (object?)null, favorite_genre = (object?)null });
         }

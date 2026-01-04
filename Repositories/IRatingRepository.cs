@@ -9,5 +9,6 @@ namespace MRP_SWEN1.Repositories
         Task<IEnumerable<Rating>> GetByMediaId(int mediaId);
         Task Update(Rating rating);
         Task Delete(int id);
+        Task<IEnumerable<Rating>> GetByUserId(int userId);
     }
 }

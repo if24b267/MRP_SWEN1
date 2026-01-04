@@ -11,5 +11,8 @@
         public string? Comment { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public bool Confirmed { get; set; } = false; // moderation flag (default false)
+                                                     
+        // Nur gefüllt, wenn JOIN über GetByMediaId erfolgt
+        public string? Username { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using MRP_SWEN1.Auth;
+﻿using MRP_SWEN1.Auth;
 using MRP_SWEN1.Controllers;
 using MRP_SWEN1.Repositories;
 using MRP_SWEN1.Services;
@@ -30,7 +28,7 @@ namespace MRP_SWEN1
 
             // Controllers
             var usersController = new UsersController(userRepo, authService, tokenStore);
-            var mediaController = new MediaController(mediaRepo, ratingRepo, authService, tokenStore);
+            var mediaController = new MediaController(mediaRepo, ratingRepo, authService, tokenStore, connStr);
             var favController = new FavoritesController(authService, connStr);
             var statsController = new StatisticsController(authService, connStr);
             var recController = new RecommendationsController(authService, connStr);

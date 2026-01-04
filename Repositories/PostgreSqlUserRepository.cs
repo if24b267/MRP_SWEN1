@@ -14,8 +14,8 @@ namespace MRP_SWEN1.Repositories
         {
             using var db = new NpgsqlConnection(_connStr);
             const string sql = @"INSERT INTO users (username, password_hash, salt, favorite_genre)
-                                 VALUES (@Username, @PasswordHash, @Salt, @FavoriteGenre)
-                                 RETURNING id;";
+                         VALUES (@Username, @PasswordHash, @Salt, @FavoriteGenre)
+                         RETURNING id;";
             return await db.QuerySingleAsync<int>(sql, user);
         }
 

@@ -21,7 +21,7 @@ namespace MRP_SWEN1
             _router = new Router();
         }
 
-        // Start only with already-created controllers (In-Memory mode)
+        // Wire given controllers and start http listener
         public void StartWithControllers(
             UsersController uc,
             MediaController mc,
@@ -34,6 +34,7 @@ namespace MRP_SWEN1
             _router.Register("POST", "/api/users/register", uc.HandleRegister);
             _router.Register("POST", "/api/users/login", uc.HandleLogin);
             _router.Register("GET", "/api/users/{username}/profile", uc.HandleGetProfile);
+            _router.Register("PUT", "/api/users/{username}/profile", uc.HandleUpdateProfile);
 
             // Media
             _router.Register("POST", "/api/media", mc.HandleCreate);
@@ -48,6 +49,7 @@ namespace MRP_SWEN1
             _router.Register("PUT", "/api/ratings/{id}", mc.HandleUpdateRating);
             _router.Register("DELETE", "/api/ratings/{id}", mc.HandleDeleteRating);
             _router.Register("GET", "/api/ratings/mine", mc.HandleGetMyRatings);
+            _router.Register("PUT", "/api/ratings/{id}/confirm", mc.HandleConfirmRatingComment);
 
             // Favorites
             _router.Register("POST", "/api/media/{id}/favorite", fc.HandleToggle);
@@ -87,7 +89,6 @@ namespace MRP_SWEN1
                 _ = Task.Run(() => ProcessContext(context));
             }
         }
-
 
         public void Stop()
         {
@@ -131,7 +132,6 @@ namespace MRP_SWEN1
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
                 // catch any unexpected errors in the request handling
                 Console.WriteLine("Unhandled exception: " + ex);
                 try

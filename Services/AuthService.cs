@@ -31,10 +31,10 @@ namespace MRP_SWEN1.Services
             // generate 16 random bytes as salt
             var salt = RandomNumberGenerator.GetBytes(16);
 
-            // compute the password hash using PBKDF2 (see helper below)
+            // compute the password hash using PBKDF2
             var hash = PBKDF2Hash(password, salt);
 
-            // create User object with hash + salt (in-memory repo stores it)
+            // create User object with hash + salt (in-memory (user model) repo stores it)
             var user = new User { Username = username, PasswordHash = hash, Salt = salt };
 
             // store user and get assigned id (we do not use id here further,

@@ -9,7 +9,8 @@ namespace MRP_SWEN1
     {
         static void Main(string[] args)
         {
-            int port = Environment.GetEnvironmentVariable("MRP_PORT") is string p && int.TryParse(p, out var pp) ? pp : 8080;
+            int port = Environment.GetEnvironmentVariable("MRP_PORT") is string p && 
+                int.TryParse(p, out var pp) ? pp : 8080;
 
             Console.WriteLine($"Starting MRP HTTP server on http://+:{port}/api/");
             var server = new HttpServer(prefix: $"http://+:{port}/api/");
@@ -27,8 +28,8 @@ namespace MRP_SWEN1
             var authService = new AuthService(userRepo, tokenStore);
 
             // Controllers
-            var usersController = new UsersController(userRepo, authService, tokenStore);
-            var mediaController = new MediaController(mediaRepo, ratingRepo, authService, tokenStore, connStr);
+            var usersController = new UsersController(userRepo, authService, tokenStore, connStr);
+            var mediaController = new MediaController(mediaRepo, ratingRepo, authService, connStr);
             var favController = new FavoritesController(authService, connStr);
             var statsController = new StatisticsController(authService, connStr);
             var recController = new RecommendationsController(authService, connStr);
@@ -44,6 +45,9 @@ namespace MRP_SWEN1
                 likeController
             );
 
+            // Keep process alive until user hits Ctrl+C.
+            // We tell the OS to cancel the default shutdown behaviour,
+            // cleanly ("gracefully") stop the server, and then release the wait-handle.
             Console.WriteLine("Press Ctrl+C to stop.\n");
             var exitEvent = new ManualResetEvent(false);
             Console.CancelKeyPress += (s, e) =>

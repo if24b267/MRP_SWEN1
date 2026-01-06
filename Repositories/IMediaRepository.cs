@@ -2,7 +2,6 @@
 
 namespace MRP_SWEN1.Repositories
 {
-    // Interface for media persistence (keeps storage implementation swappable).
     public interface IMediaRepository
     {
         Task<int> Create(MediaEntry media);

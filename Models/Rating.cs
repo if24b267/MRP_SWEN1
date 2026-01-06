@@ -1,7 +1,6 @@
 ﻿namespace MRP_SWEN1.Models
 {
-    // Rating model stored in the rating repository.
-    // Confirmed is a moderation flag — not used in the intermediate hand-in UI.
+    // Rating model stored in the rating repository
     public class Rating
     {
         public int Id { get; set; }
@@ -11,8 +10,8 @@
         public string? Comment { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public bool Confirmed { get; set; } = false; // moderation flag (default false)
-                                                     
-        // Nur gefüllt, wenn JOIN über GetByMediaId erfolgt
+
+        // Only filled if joined via GetByMediaId
         public string? Username { get; set; }
     }
 }

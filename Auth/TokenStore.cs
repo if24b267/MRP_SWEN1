@@ -12,9 +12,8 @@ namespace MRP_SWEN1.Auth
         public DateTime Created { get; set; } = DateTime.UtcNow;
     }
 
-    // In-memory token store used for authentication in the intermediate hand-in.
     // This uses a thread-safe ConcurrentDictionary and is intentionally simple:
-    // tokens are kept in memory instead of a DB.
+    // tokens are kept in memory instead of the DB.
     public class TokenStore
     {
         // Thread-safe dictionary, so multiple requests can read/write safely.
@@ -26,7 +25,7 @@ namespace MRP_SWEN1.Auth
         // Try to lookup a token
         public bool TryGet(string token, out TokenInfo info) => _store.TryGetValue(token, out info);
 
-        // Remove token (not used everywhere, but handy for logout if implemented)
+        // Remove token
         public void Remove(string token) => _store.TryRemove(token, out _);
     }
 }

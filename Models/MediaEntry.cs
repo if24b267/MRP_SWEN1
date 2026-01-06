@@ -1,7 +1,6 @@
 ﻿namespace MRP_SWEN1.Models
 {
     // Domain model used by the API and repositories.
-    // For the intermediate hand-in I kept it minimal and serializable to/from JSON.
     public class MediaEntry
     {
         public int Id { get; set; }

@@ -31,11 +31,7 @@ namespace MRP_SWEN1.Repositories
                 Confirmed = rating.Confirmed
             };
 
-            Console.WriteLine($"[REPO] SQL: {sql}");
-            Console.WriteLine($"[REPO] PARAMS: MediaId={param.MediaId}, UserId={param.UserId}, Stars={param.Stars}, Comment={param.Comment ?? "null"}, Confirmed={param.Confirmed}");
-
             var id = await db.QuerySingleAsync<int>(sql, param);
-            Console.WriteLine($"[REPO] RETURNED ID: {id}");
             return id;
         }
 

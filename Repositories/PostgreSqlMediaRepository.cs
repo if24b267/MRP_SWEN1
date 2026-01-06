@@ -8,7 +8,6 @@ namespace MRP_SWEN1.Repositories
     {
         private readonly string _connStr;
 
-        // Repository uses a PostgreSQL connection string
         public PostgreSqlMediaRepository(string connStr) => _connStr = connStr;
 
         // Create a new media entry and return the generated id

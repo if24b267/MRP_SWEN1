@@ -16,13 +16,11 @@ namespace MRP_SWEN1.Repositories
         {
             using var db = new NpgsqlConnection(_connStr);
 
-            Console.WriteLine($"[REPO] INSERT PARAMS: MediaId={rating.MediaId}, UserId={rating.UserId}, Stars={rating.Stars}, Comment={rating.Comment ?? "null"}, Confirmed={rating.Confirmed}");
-
             const string sql = @"
                     INSERT INTO ratings (media_id, user_id, stars, comment, confirmed)
                     VALUES (@MediaId, @UserId, @Stars, @Comment, @Confirmed)
                     RETURNING id;
-                ";
+            ";
 
             var param = new
             {

@@ -41,7 +41,9 @@ namespace MRP_SWEN1.Repositories
             var row = await db.QuerySingleOrDefaultAsync<dynamic>(sql, new { username });
 
             if (row == null)
+            {
                 return null;
+            }
 
             // Map the database row to a User object
             return new User

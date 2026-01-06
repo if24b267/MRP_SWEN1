@@ -8,7 +8,6 @@ using Xunit;
 
 namespace MRP_SWEN1.Tests
 {
-    // Integration tests – talk to a *real* Postgres instance
     public class IntegrationTests : IAsyncLifetime
     {
         private const string ConnStr =

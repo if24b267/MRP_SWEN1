@@ -66,7 +66,7 @@ namespace MRP_SWEN1.Services
             var token = $"{username}-mrpToken-{Guid.NewGuid()}";
 
             _tokenStore.Add(token, new TokenInfo { Token = token, UserId = user.Id, Username = username });
-
+            
             return (true, token, null, user);
         }
 

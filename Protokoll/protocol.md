@@ -29,14 +29,14 @@ Umsetzung aller geforderten **Final MUST-HAVEs**, insbesondere:
 
 ## Technische Entscheidungen
 - **HttpListener:**  
-  Reines HTTP ohne Frameworks (z. B. kein ASP.NET), um Routing- und Protokoll-Logik selbst umzusetzen.
+  Reines HTTP ohne Frameworks (z. B. kein ASP.NET), um Routing- und Protokoll-Logik selbst umgesetzt.
 
 - **PostgreSQL + Docker:**  
   Austausch der In-Memory-Repositories durch:
   - `PostgreSqlUserRepository`  
   - `PostgreSqlMediaRepository`  
   - `PostgreSqlRatingRepository`  
-  → Vorteil: persistente Speicherung und realistische Backend-Architektur.
+  --> Vorteil: persistente Speicherung und realistische Backend-Architektur.
 
 - **Kein OR-Mapper:**  
   SQL-Zugriffe erfolgen ausschließlich über **manuell geschriebene, parametrisierte Queries** (`Npgsql`).
@@ -75,7 +75,7 @@ Zusätzlich zu den Basisfunktionen aus dem Intermediate wurden folgende Features
   - `RecommendationsController`  
   - `RatingLikesController`  
 - **Services:** `AuthService`, `TokenStore`  
-- **Repositories:** `IUserRepository`, `IMediaRepository`, `IRatingRepository` (+ PostgreSQL-Versionen)  
+- **Repositories:** `IUserRepository`, `IMediaRepository`, `IRatingRepository` (+ PostgreSQL-Varianten)  
 - **Modelle:** `User`, `MediaEntry`, `Rating`, `Favorite`, `RatingLike`
 
 ---
@@ -111,7 +111,7 @@ Zusätzlich zu den Basisfunktionen aus dem Intermediate wurden folgende Features
 ## Probleme & Lösungen (Kurz)
 
 - **Problem:**  
-  `HttpListener` mit `http://+:8080/` benötigt unter Windows teilweise Administratorrechte.
+  `HttpListener` mit `http://+:8080/` benötigt unter Windows Administratorrechte.
 
 - **Lösung:**  
   Verwendung von `http://localhost:8080/` als Fallback  
